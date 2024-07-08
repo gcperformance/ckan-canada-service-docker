@@ -1,9 +1,42 @@
-FROM python:3.9-slim
+# Use CKAN base image
+FROM openknowledge/ckan-dev:2.9
+
+# Set environment variables
+ENV PGHOST=postgres \
+    PGDATABASE=postgres \
+    PGUSER=postgres \
+    PGPASSWORD=postgres \
+    CKAN_POSTGRES_DB=ckan_test \
+    CKAN_DATASTORE_POSTGRES_DB=datastore_test \
+    CKAN_POSTGRES_USER=ckan_default \
+    CKAN_DATASTORE_POSTGRES_READ_USER=datastore_read \
+    CKAN_DATASTORE_POSTGRES_WRITE_USER=datastore_write \
+    CKAN_POSTGRES_PWD=pass \
+    CKAN_DATASTORE_POSTGRES_READ_PWD=pass \
+    CKAN_DATASTORE_POSTGRES_WRITE_PWD=pass \
+    CKAN_SQLALCHEMY_URL=postgresql://ckan_default:pass@postgres/ckan_test \
+    CKAN_DATASTORE_WRITE_URL=postgresql://datastore_write:pass@postgres/datastore_test \
+    CKAN_DATASTORE_READ_URL=postgresql://datastore_read:pass@postgres/datastore_test \
+    CKAN_SOLR_URL=http://solr:8983/solr/ckan_registry \
+    CKAN_REDIS_URL=redis://redis:6379/1
+
+
+# Uninstall current CKAN
+RUN pip uninstall -y ckan
+
+# Install system dependencies
+#RUN apk update && apk add jpeg-dev git \
 
 RUN pip install setuptools==44.1.0 
 RUN pip install --upgrade pip==23.2.1
 
-RUN git clone -b canada-py3 https://github.com/open-data/ckan.git /srv/app/src/ckan
+# Craziness from circleci
+RUN git --git-dir=\/srv\/app\/src\/ckan\/.git --work-tree=\/srv\/app\/src\/ckan\/ remote add canada https://github.com/open-data/ckan.git
+RUN git --git-dir=\/srv\/app\/src\/ckan\/.git --work-tree=\/srv\/app\/src\/ckan\/ fetch canada canada-py3
+RUN git --git-dir=\/srv\/app\/src\/ckan\/.git --work-tree=\/srv\/app\/src\/ckan\/ checkout -b canada-py3 canada/canada-py3
+RUN git --git-dir=\/srv\/app\/src\/ckan\/.git --work-tree=\/srv\/app\/src\/ckan\/ pull
+
+# RUN git clone -b canada-py3 https://github.com/open-data/ckan.git /srv/app/src/ckan
 RUN cd /srv/app/src/ckan \
     && pip install -r requirements.txt -r dev-requirements.txt \
     && pip install -e .
@@ -25,7 +58,7 @@ RUN git clone https://github.com/open-data/ckanext-security.git \
 
 # ckanext-fluent
 RUN git clone https://github.com/ckan/ckanext-fluent.git \
-&& install -r ./ckanext-fluent/requirements.txt \
+&& pip install -r ./ckanext-fluent/requirements.txt \
 && pip install -e ./ckanext-fluent
 
 # ckanext-recombinant
