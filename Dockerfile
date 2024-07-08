@@ -1,60 +1,64 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Use CKAN base image
+FROM openknowledge/ckan-dev:2.9
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Set environment variables
+ENV PGHOST=postgres \
+    PGDATABASE=postgres \
+    PGUSER=postgres \
+    PGPASSWORD=pass \
+    CKAN_POSTGRES_DB=ckan_test \
+    CKAN_DATASTORE_POSTGRES_DB=datastore_test \
+    CKAN_POSTGRES_USER=ckan_default \
+    CKAN_DATASTORE_POSTGRES_READ_USER=datastore_read \
+    CKAN_DATASTORE_POSTGRES_WRITE_USER=datastore_write \
+    CKAN_POSTGRES_PWD=pass \
+    CKAN_DATASTORE_POSTGRES_READ_PWD=pass \
+    CKAN_DATASTORE_POSTGRES_WRITE_PWD=pass \
+    CKAN_SQLALCHEMY_URL=postgresql://ckan_default:pass@postgres/ckan_test \
+    CKAN_DATASTORE_WRITE_URL=postgresql://datastore_write:pass@postgres/datastore_test \
+    CKAN_DATASTORE_READ_URL=postgresql://datastore_read:pass@postgres/datastore_test \
+    CKAN_SOLR_URL=http://solr:8983/solr/ckan_registry \
+    CKAN_REDIS_URL=redis://redis:6379/1
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        git \
-        build-essential \
-        libpq-dev \
-        python3-dev \
-        libxml2-dev \
-        libxslt1-dev \
-        libssl-dev \
-        libmagic-dev \
-        libmagic1 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Clone the open-data CKAN fork and switch to the specified branch
-RUN git clone https://github.com/open-data/ckan.git
-
-# Install CKAN
-RUN pip install -r ./ckan/requirements.txt && pip install -r ./ckan/dev-requirements.txt
-RUN pip install -e ./ckan
-RUN pip install python-json-logger rdflib geomet future googleanalytics flask markupsafe 
+RUN apk update && apk add jpeg-dev git \
+    && pip install setuptools==44.1.0 \
+    && pip install --upgrade pip==23.2.1 \
+    && git clone https://github.com/open-data/ckan.git /srv/app/src/ckan \
+    && cd /srv/app/src/ckan \
+    && git checkout canada-py3 \
+    && pip install -r requirements.txt -r dev-requirements.txt \
+    && pip install -e .
 
 # Clone and install necessary extensions
 # ckanext-canada from our fork
-RUN git clone https://github.com/gc-performance/ckanext-canada.git
-RUN pip install -r ./ckanext-canada/requirements.txt
-RUN pip install -e ./ckanext-canada
+RUN git clone https://github.com/gc-performance/ckanext-canada.git \ 
+&& pip install -r ./ckanext-canada/requirements.txt \
+&& pip install -e ./ckanext-canada
 
 # ckanext-scheming
-RUN git clone https://github.com/ckan/ckanext-scheming.git
-RUN pip install -e ./ckanext-scheming
+RUN git clone https://github.com/ckan/ckanext-scheming.git \
+&& pip install -e ./ckanext-scheming
 
 # ckanext-security
-RUN git clone https://github.com/open-data/ckanext-security.git
-RUN pip install -r ./ckanext-security/requirements.txt
-RUN pip install -e ./ckanext-security
+RUN git clone https://github.com/open-data/ckanext-security.git \ 
+&& pip install -r ./ckanext-security/requirements.txt \
+&& pip install -e ./ckanext-security
 
 # ckanext-fluent
-RUN git clone https://github.com/ckan/ckanext-fluent.git
-RUN pip install -r ./ckanext-fluent/requirements.txt
-RUN pip install -e ./ckanext-fluent
+RUN git clone https://github.com/ckan/ckanext-fluent.git \
+&& install -r ./ckanext-fluent/requirements.txt \
+&& pip install -e ./ckanext-fluent
 
 # ckanext-recombinant
-RUN git clone https://github.com/open-data/ckanext-recombinant.git
-RUN pip install -r ./ckanext-recombinant/requirements.txt
-RUN pip install -e ./ckanext-recombinant
+RUN git clone https://github.com/open-data/ckanext-recombinant.git \
+&& pip install -r ./ckanext-recombinant/requirements.txt \
+&& pip install -e ./ckanext-recombinant
 
 # ckanext-dcat
-RUN git clone https://github.com/open-data/ckanext-dcat.git
-RUN pip install -r ./ckanext-dcat/requirements.txt
-RUN pip install -e ./ckanext-dcat
+RUN git clone https://github.com/open-data/ckanext-dcat.git \
+&& pip install -r ./ckanext-dcat/requirements.txt \
+&& pip install -e ./ckanext-dcat
 
 # Run CKAN setup
 RUN python setup.py develop --user
