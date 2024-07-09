@@ -1,34 +1,40 @@
 services:
   db:
+    container_name: db 
     image: postgres:14
     environment:
-      POSTGRES_USER: postgres 
-      POSTGRES_PASSWORD: postgres 
-      POSTGRES_DB: postgres 
+      POSTGRES_USER: ckan
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - .devcontainer/postgres-docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./postgres:/var/lib/postgresql/data
+      # - .devcontainer/postgres-docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   solr:
-    image: ckan/ckan-solr:2.9-solr8
+    container_name: solr
+    image: opendatacanada/solr
+    #image: ckan/ckan-solr:2.9-solr8
     volumes:
-      - solr_data:/opt/solr/server/solr/ckan
+      - ./solr:/opt/solr/server/solr/ckan
     ports:
       - "8983:8983"
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - ckan
+  #   entrypoint:
+  #     - docker-entrypoint.sh
+  #     - solr-precreate
+  #     - ckan
 
   redis:
+    container_name: redis
     image: redis:6-alpine
     ports:
       - "6379:6379"
 
   datapusher:
+    container_name: datapusher
     image: ckan/ckan-base-datapusher:0.0.19
 
   ckan:
+    container_name: ckan
     build: .
     depends_on:
       - db
@@ -38,11 +44,28 @@ services:
     ports:
       - "5000:5000"
     environment:
-      CKAN_SQLALCHEMY_URL: postgresql://ckan:ckan@db/ckan
-      CKAN_SOLR_URL: http://solr:8983/solr/ckan
-      CKAN_REDIS_URL: redis://redis:6379/1
+      PGHOST: db 
+      PGUSER: ckan
+      PGPASSWORD: password
+      PGDATABASE: postgres
       CKAN_SITE_URL: http://localhost:5000
+      CKAN_POSTGRES_DB: postgres 
+      CKAN_DATASTORE_POSTGRES_DB: datastore
+      CKAN_POSTGRES_USER: ckan
+      CKAN_DATASTORE_POSTGRES_READ_USER: datastore_read
+      CKAN_DATASTORE_POSTGRES_WRITE_USER: datastore_write
+      CKAN_POSTGRES_PWD: password
+      CKAN_DATASTORE_POSTGRES_READ_PWD: password
+      CKAN_DATASTORE_POSTGRES_WRITE_PWD: password
+      CKAN_SQLALCHEMY_URL: postgresql://ckan:password@db/postgres
+      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:password@db/datastore_test
+      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:password@db/datastore_test
+      CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
+      CKAN_REDIS_URL: redis://redis:6379/1
+    volumes:
+      - ./ckan:/srv/app
+      - ./data:/workspace/data
 
 volumes:
   pg_data:
-  solr_data:
+  #solr_data:

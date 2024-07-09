@@ -2,24 +2,10 @@
 FROM openknowledge/ckan-dev:2.9
 
 # Set environment variables
-ENV PGHOST=postgres \
-    PGDATABASE=postgres \
-    PGUSER=postgres \
-    PGPASSWORD=postgres \
-    CKAN_POSTGRES_DB=ckan_test \
-    CKAN_DATASTORE_POSTGRES_DB=datastore_test \
-    CKAN_POSTGRES_USER=ckan_default \
-    CKAN_DATASTORE_POSTGRES_READ_USER=datastore_read \
-    CKAN_DATASTORE_POSTGRES_WRITE_USER=datastore_write \
-    CKAN_POSTGRES_PWD=pass \
-    CKAN_DATASTORE_POSTGRES_READ_PWD=pass \
-    CKAN_DATASTORE_POSTGRES_WRITE_PWD=pass \
-    CKAN_SQLALCHEMY_URL=postgresql://ckan_default:pass@postgres/ckan_test \
-    CKAN_DATASTORE_WRITE_URL=postgresql://datastore_write:pass@postgres/datastore_test \
-    CKAN_DATASTORE_READ_URL=postgresql://datastore_read:pass@postgres/datastore_test \
-    CKAN_SOLR_URL=http://solr:8983/solr/ckan_registry \
-    CKAN_REDIS_URL=redis://redis:6379/1
-
+#ENV PGHOST=postgres \
+#    PGDATABASE=postgres \
+#    PGUSER=postgres \
+#    PGPASSWORD=postgres \
 
 # Uninstall current CKAN
 RUN pip uninstall -y ckan
@@ -72,13 +58,13 @@ RUN git clone https://github.com/open-data/ckanext-dcat.git \
 && pip install -e ./ckanext-dcat
 
 # Run CKAN setup
-RUN python setup.py develop --user
+#RUN python setup.py develop --user
 
 # Generate CKAN config file
 RUN ckan generate config ckan.ini
 
 # Set up storage
-RUN mkdir /workspace/data \
+RUN mkdir -p /workspace/data \
     && ckan config-tool ckan.ini "ckan.storage_path=/workspace/data"
 
 # Set up site URL, assuming environment variables are set for CODESPACE_NAME and GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN
