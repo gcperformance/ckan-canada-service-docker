@@ -1,11 +1,12 @@
 services:
   db:
-    container_name: db 
+    container_name: db
     image: postgres:14
     environment:
       POSTGRES_USER: ckan
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./postgres:/var/lib/postgresql/data
       # - .devcontainer/postgres-docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -15,13 +16,9 @@ services:
     image: opendatacanada/solr
     #image: ckan/ckan-solr:2.9-solr8
     volumes:
-      - ./solr:/opt/solr/server/solr/ckan
+      - ./solr:/var/solr/data
     ports:
       - "8983:8983"
-  #   entrypoint:
-  #     - docker-entrypoint.sh
-  #     - solr-precreate
-  #     - ckan
 
   redis:
     container_name: redis
@@ -40,16 +37,16 @@ services:
       - db
       - solr
       - redis
-      - datapusher 
+      - datapusher
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
-      PGHOST: db 
+      PGHOST: db
       PGUSER: ckan
       PGPASSWORD: password
       PGDATABASE: postgres
       CKAN_SITE_URL: http://localhost:5000
-      CKAN_POSTGRES_DB: postgres 
+      CKAN_POSTGRES_DB: postgres
       CKAN_DATASTORE_POSTGRES_DB: datastore
       CKAN_POSTGRES_USER: ckan
       CKAN_DATASTORE_POSTGRES_READ_USER: datastore_read
@@ -62,10 +59,10 @@ services:
       CKAN_DATASTORE_READ_URL: postgresql://datastore_read:password@db/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
       CKAN_REDIS_URL: redis://redis:6379/1
-    volumes:
-      - ./ckan:/srv/app
-      - ./data:/workspace/data
+        #volumes:
+        #  - ./ckan:/srv
+        #  - ./workspace:/workspace
 
 volumes:
   pg_data:
-  #solr_data:
+  solr_data:
