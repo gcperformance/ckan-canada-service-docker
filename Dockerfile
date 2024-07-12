@@ -35,15 +35,22 @@ RUN find /srv/app/ -name '*.pyc' -delete
 
 # CKAN setup
 
+ARG PGHOST
+ARG PGUSER
+ARG PGPASSWORD
+ARG PGPORT
+ARG PGDATABASE
+
 RUN rm ./ckan.ini ./who.ini
 RUN ln -s /srv/app/src/ckan-canada/test-core.ini ./ckan.ini
 RUN ln -s /srv/app/src/ckan/test-core.ini ./test-core.ini
 RUN ln -s /srv/app/src/ckan/who.ini ./who.ini
 # RUN mkdir -p ./links/ckanext/datastore/tests/ && ln -s /srv/app/src/ckan/ckanext/datastore/tests/allowed_functions.txt ./links/ckanext/datastore/tests/allowed_functions.txt
-RUN mkdir -p ./links/ckan/bin/postgres_init/ && ln -s /srv/app/src/ckan/bin/postgres_init/1_create_ckan_db.sh ./links/ckan/bin/postgres_init/1_create_ckan_db.sh && ln -s /srv/app/src/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
-# RUN python3 setup.py develop
-RUN . ./links/ckan/bin/postgres_init/1_create_ckan_db.sh
-RUN . ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
+#RUN mkdir -p ./links/ckan/bin/postgres_init/ && ln -s /srv/app/src/ckan/bin/postgres_init/1_create_ckan_db.sh ./links/ckan/bin/postgres_init/1_create_ckan_db.sh && ln -s /srv/app/src/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
+#
+#
+#RUN . ./links/ckan/bin/postgres_init/1_create_ckan_db.sh
+#RUN . ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
 RUN ckan -c ckan.ini db init
 RUN ckan -c ckan.ini datastore set-permissions | psql -U postgres --set ON_ERROR_STOP=1
 RUN ckan -c ckan.ini canada update-triggers
@@ -87,5 +94,6 @@ RUN python3 /srv/app/src/ckan-canada/bin/download_country.py
 
 #T Run CKAN
 
+#ENTRYPOINT ["bash"]
 ENTRYPOINT ["tail", "-f", "/dev/null"]
 # CMD ["ckan", "run", "--host", "0.0.0.0"]

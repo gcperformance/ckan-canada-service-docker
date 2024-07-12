@@ -1,14 +1,24 @@
 services:
-  db:
-    container_name: db
-    image: postgres:14
+  postgres:
+    container_name: postgres
+    build:
+      context: ./postgres
+      args:
+        CKAN_POSTGRES_DB: ckan_test
+        CKAN_DATASTORE_POSTGRES_DB: datastore_test
+        CKAN_POSTGRES_USER: ckan_default
+        CKAN_DATASTORE_POSTGRES_READ_USER: datastore_read
+        CKAN_DATASTORE_POSTGRES_WRITE_USER: datastore_write
+        CKAN_POSTGRES_PWD: pass
+        CKAN_DATASTORE_POSTGRES_READ_PWD: pass
+        CKAN_DATASTORE_POSTGRES_WRITE_PWD: pass
     environment:
-      POSTGRES_USER: ckan
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
       POSTGRES_DB: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
+      # PGDATA: /var/lib/postgresql/data/pgdata
+    #volumes:
+    #  - ./postgres:/var/lib/postgresql/data
       # - .devcontainer/postgres-docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   solr:
@@ -32,31 +42,25 @@ services:
 
   ckan:
     container_name: ckan
-    build: .
+    build:
+      context: .
+      args:
+        PGHOST: postgres
+        PGPORT: 5432
+        PGUSER: postgres
+        PGPASSWORD: pass
+        PGDATABASE: postgres
     depends_on:
-      - db
+      - postgres
       - solr
       - redis
       - datapusher
     ports:
       - "5001:5000"
     environment:
-      PGHOST: db
-      PGUSER: ckan
-      PGPASSWORD: password
-      PGDATABASE: postgres
-      CKAN_SITE_URL: http://localhost:5000
-      CKAN_POSTGRES_DB: postgres
-      CKAN_DATASTORE_POSTGRES_DB: datastore
-      CKAN_POSTGRES_USER: ckan
-      CKAN_DATASTORE_POSTGRES_READ_USER: datastore_read
-      CKAN_DATASTORE_POSTGRES_WRITE_USER: datastore_write
-      CKAN_POSTGRES_PWD: password
-      CKAN_DATASTORE_POSTGRES_READ_PWD: password
-      CKAN_DATASTORE_POSTGRES_WRITE_PWD: password
-      CKAN_SQLALCHEMY_URL: postgresql://ckan:password@db/postgres
-      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:password@db/datastore_test
-      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:password@db/datastore_test
+      CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
+      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
+      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
       CKAN_REDIS_URL: redis://redis:6379/1
         #volumes:
