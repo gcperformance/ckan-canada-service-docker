@@ -33,82 +33,16 @@ RUN pip install -e 'git+https://github.com/open-data/ckanext-security.git@canada
 RUN find /srv/app/ -name '*.pyc' -delete
 
 # CKAN setup
-
-#ARG PGHOST
-#ARG PGUSER
-#ARG PGPASSWORD
-#ARG PGPORT
-#ARG PGDATABASE
-
-#ARG CKAN_SQLALCHEMY_URL
-#ARG CKAN_DATASTORE_WRITE_URL
-#ARG CKAN_DATASTORE_READ_URL
-#ARG CKAN_SOLR_URL
-#ARG CKAN_REDIS_URL
-
 RUN rm ./ckan.ini ./who.ini
 
 COPY . .
 RUN ln -s /srv/app/src/ckan/who.ini ./links/who.ini
-RUN mkdir -p ./links/data/sessions
+RUN mkdir -p ./links/
 
 # copy work over
-#COPY service.yaml /srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml
-
-
-
-# RUN mkdir -p ./links/ckanext/datastore/tests/ && ln -s /srv/app/src/ckan/ckanext/datastore/tests/allowed_functions.txt ./links/ckanext/datastore/tests/allowed_functions.txt
-#RUN mkdir -p ./links/ckan/bin/postgres_init/ && ln -s /srv/app/src/ckan/bin/postgres_init/1_create_ckan_db.sh ./links/ckan/bin/postgres_init/1_create_ckan_db.sh && ln -s /srv/app/src/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
-#
-#
-#RUN . ./links/ckan/bin/postgres_init/1_create_ckan_db.sh
-#RUN . ./links/ckan/bin/postgres_init/2_create_ckan_datastore_db.sh
-# RUN cat ./ckan.ini
-#
-# RUN ckan -c ./ckan.ini db init
-# RUN ckan -c ckan.ini datastore set-permissions | psql -U postgres --set ON_ERROR_STOP=1
-# RUN ckan -c ckan.ini canada update-triggers
-# RUN ckan -c ckan.ini recombinant create-triggers -a
-# RUN python3 /srv/app/src/ckan-canada/bin/download_country.py
-
-#
-## # Generate CKAN config file
-## RUN ckan generate config ckan.ini
-##
-## # Set up storage
-## RUN mkdir -p /workspace/data \
-##     && ckan config-tool ckan.ini "ckan.storage_path=/workspace/data"
-##
-## # Set up site URL, assuming environment variables are set for CODESPACE_NAME and GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN
-## ARG CKAN_SITE_URL
-## RUN ckan config-tool ckan.ini "ckan.site_url=${CKAN_SITE_URL}"
-##
-## # # Initialize the database
-## # RUN ckan db init
-## #
-## # # Create sysadmin user
-## # RUN ckan user add ckan_admin email=admin@example.com password=test1234 \
-## #     && ckan sysadmin add ckan_admin
-## #
-## # ## Set up DataStore + DataPusher
-## # #RUN API_TOKEN=$(ckan user token add ckan_admin datapusher | tail -n 1 | tr -d '\t') \
-## # #    && ckan config-tool ckan.ini "ckan.datapusher.api_token=${API_TOKEN}" \
-## # #    && ckan config-tool ckan.ini \
-## # #        "ckan.datastore.write_url=postgresql://ckan_default:pass@localhost/datastore_default" \
-## # #        "ckan.datastore.read_url=postgresql://datastore_default:pass@localhost/datastore_default" \
-## # #        "ckan.datapusher.url=http://localhost:8800" \
-## # #        "ckan.datapusher.callback_url_base=http://localhost:5000" \
-## # #        "ckan.plugins=activity datastore datapusher datatables_view"
-## #
-## # # Set permissions for DataStore
-## # RUN ckan datastore set-permissions | psql $(grep ckan.datastore.write_url ckan.ini | awk -F= '{print $2}')
+COPY service.yaml /srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml
 
 ## Expose port 5000 for web interface
 EXPOSE 5000
 
-#T Run CKAN
-
-#ENTRYPOINT ["bash"]
-# ENTRYPOINT ["tail", "-f", "/dev/null"]
-#CMD ["./db/initdb.sh && ./setup.sh"]
-# CMD ["ckan", "run", "--host", "0.0.0.0"]
+CMD ["start.sh"]
