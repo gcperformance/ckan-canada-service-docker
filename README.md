@@ -1,3 +1,3 @@
-docker compose pull
-docker compose build 
-docker compose up
+- `docker compose pull`
+- `docker compose build`
+- `docker compose up`
