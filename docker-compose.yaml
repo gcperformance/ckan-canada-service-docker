@@ -3,19 +3,6 @@ services:
   ckan:
     container_name: ckan
     build: .
-        #args:
-        #PGHOST: postgres
-        #PGPORT: 5432
-        #PGUSER: ckan_default
-        #PGPASSWORD: pass
-        #PGDATABASE: ckan_test
-
-        #CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
-        #CKAN_DATASTORE_WRITE_URL: postgresql://ckan_default:pass@postgres/datastore_test
-        #CKAN_DATASTORE_READ_URL: postgresql://ckan_default:pass@postgres/datastore_test
-        #CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
-        #CKAN_REDIS_URL: redis://redis:6379/1
-
     depends_on:
       - postgres
       - solr
@@ -52,7 +39,6 @@ services:
     command: ./start.sh
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
-
 
   postgres:
     container_name: postgres
