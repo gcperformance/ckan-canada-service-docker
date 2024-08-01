@@ -1,71 +1,103 @@
 services:
+
+  ckan:
+    container_name: ckan
+    build: .
+        #args:
+        #PGHOST: postgres
+        #PGPORT: 5432
+        #PGUSER: ckan_default
+        #PGPASSWORD: pass
+        #PGDATABASE: ckan_test
+
+        #CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
+        #CKAN_DATASTORE_WRITE_URL: postgresql://ckan_default:pass@postgres/datastore_test
+        #CKAN_DATASTORE_READ_URL: postgresql://ckan_default:pass@postgres/datastore_test
+        #CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
+        #CKAN_REDIS_URL: redis://redis:6379/1
+
+    depends_on:
+      - postgres
+      - solr
+      - redis
+      - datapusher
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ckan_default
+      PGPASSWORD: pass
+      PGDATABASE: ckan_test
+
+      CKAN_POSTGRES_DB: ckan_test
+      CKAN_DATASTORE_POSTGRES_DB: datastore_test
+      CKAN_POSTGRES_USER: ckan_default
+      CKAN_DATASTORE_POSTGRES_READ_USER: ckan_default
+      CKAN_DATASTORE_POSTGRES_WRITE_USER: ckan_default
+      CKAN_POSTGRES_PWD: pass
+      CKAN_DATASTORE_POSTGRES_READ_PWD: pass
+      CKAN_DATASTORE_POSTGRES_WRITE_PWD: pass
+
+      CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
+      CKAN_DATASTORE_WRITE_URL: postgresql://ckan_default:pass@postgres/datastore_test
+      CKAN_DATASTORE_READ_URL: postgresql://ckan_default:pass@postgres/datastore_test
+      CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
+      CKAN_REDIS_URL: redis://redis:6379/1
+
+      CKAN_SITE_URL: http://localhost:5001
+
+    ports:
+      - "5001:5000"
+
+    restart: unless-stopped
+    command: ./start.sh
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+
+
   postgres:
     container_name: postgres
-    build:
-      context: ./postgres
-      args:
-        CKAN_POSTGRES_DB: ckan_test
-        CKAN_DATASTORE_POSTGRES_DB: datastore_test
-        CKAN_POSTGRES_USER: ckan_default
-        CKAN_DATASTORE_POSTGRES_READ_USER: datastore_read
-        CKAN_DATASTORE_POSTGRES_WRITE_USER: datastore_write
-        CKAN_POSTGRES_PWD: pass
-        CKAN_DATASTORE_POSTGRES_READ_PWD: pass
-        CKAN_DATASTORE_POSTGRES_WRITE_PWD: pass
+    image: postgres:14
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ckan_default
       POSTGRES_PASSWORD: pass
-      POSTGRES_DB: postgres
-      # PGDATA: /var/lib/postgresql/data/pgdata
-    #volumes:
-    #  - ./postgres:/var/lib/postgresql/data
-      # - .devcontainer/postgres-docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      POSTGRES_DB: ckan_test
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'pg_isready -U $POSTGRES_USER -d $POSTGRES_DB'"]
+
 
   solr:
     container_name: solr
     image: opendatacanada/solr
     #image: ckan/ckan-solr:2.9-solr8
     volumes:
-      - ./solr:/var/solr/data
+      - solr_data:/var/solr/data
     ports:
       - "8983:8983"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
+
 
   redis:
     container_name: redis
     image: redis:6-alpine
     ports:
       - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-e", "QUIT"]
 
   datapusher:
     container_name: datapusher
     image: ckan/ckan-base-datapusher:0.0.19
-
-  ckan:
-    container_name: ckan
-    build:
-      context: .
-      args:
-        PGHOST: postgres
-        PGPORT: 5432
-        PGUSER: postgres
-        PGPASSWORD: pass
-        PGDATABASE: postgres
-    depends_on:
-      - postgres
-      - solr
-      - redis
-      - datapusher
-    ports:
-      - "5001:5000"
-    environment:
-      CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
-      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
-      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
-      CKAN_SOLR_URL: http://solr:8983/solr/ckan_registry
-      CKAN_REDIS_URL: redis://redis:6379/1
-        #volumes:
-        #  - ./ckan:/srv
-        #  - ./workspace:/workspace
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
 volumes:
   pg_data:
