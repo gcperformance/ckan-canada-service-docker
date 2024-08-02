@@ -34,8 +34,8 @@ services:
 
     ports:
       - "5001:5000"
-    #volumes:
-    #  ./service.yaml:/srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml
+    volumes:
+      ["./service.yaml:/srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml"]
 
     restart: unless-stopped
     command: ./start.sh
