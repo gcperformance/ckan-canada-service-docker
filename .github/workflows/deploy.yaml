@@ -20,5 +20,5 @@ jobs:
           script: |
            cd ~/projects/ckan-canada-docker
            git pull
-           docker-compose build --force-rm --no-cache --compress
-           docker-compose up -d 
+           docker compose build --force-rm --no-cache --compress
+           docker compose up -d 
