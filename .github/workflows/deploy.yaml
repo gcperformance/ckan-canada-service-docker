@@ -1,0 +1,24 @@
+name: CI
+  
+on: [push]
+
+jobs:
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Deploy OG
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script_stop: true
+          command_timeout: 200m
+          script: /
+           cd /projects/ckan-canada-docker
+           git pull
+           docker-compose build --force-rm --no-cache --compress
+           docker-compose up -d 
