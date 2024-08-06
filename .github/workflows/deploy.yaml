@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.KEY }}
           script_stop: true
           command_timeout: 200m
-          script: /
+          script: |
            cd ~/projects/ckan-canada-docker
            git pull
            docker-compose build --force-rm --no-cache --compress
