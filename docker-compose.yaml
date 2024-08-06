@@ -1,5 +1,24 @@
 services:
 
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=admin@gcperformance.ca"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    restart: unless-stopped
+
   ckan:
     container_name: ckan
     build: .
@@ -33,14 +52,21 @@ services:
       CKAN_SITE_URL: ${CKAN_SITE_URL}
 
     ports:
-      - "${CKAN_SITE_URL}:5000"
+      - "${CKAN_SITE_PORT}:5000"
     volumes:
       ["./service.yaml:/srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml"]
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ckan.rule=Host(`servicetest.gcperformance.ca`)"  # Replace with your domain
+      - "traefik.http.routers.ckan.entrypoints=websecure"
+      - "traefik.http.routers.ckan.tls.certresolver=myresolver"
+      - "traefik.http.services.ckan.loadbalancer.server.port=${CKAN_SITE_PORT}"
 
     restart: unless-stopped
     command: ./start.sh
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+      test: ["CMD", "wget", "-qO", "/dev/null", CKAN_SITE_URL]
 
   postgres:
     container_name: postgres
