@@ -17,7 +17,7 @@ collection: service
 
 resources:
 
-- resource_name: service_inventory
+- resource_name: service
   title:
     en: Service Identification Information & Metrics
     fr: Service Identification Information & Metrics
@@ -1111,7 +1111,7 @@ resources:
   - update_record_modified_created_trigger
 
 
-- resource_name: service_standards
+- resource_name: service-std
   title:
     en: Service Standards & Performance Results
     fr: Service Standards & Performance Results
