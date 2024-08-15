@@ -31,7 +31,7 @@ resources:
       fr: >
         Indique l'exercice pour lequel les données sur les services sont
         déclarées.
-    datastore_type: year
+    datastore_type: text
     obligation: Mandatory
     occurrence: Single
     choices_file: choices/fiscal_year.yaml
@@ -55,6 +55,8 @@ resources:
     excel_required: true
     validation: This field must not be empty
 
+# GE: department name can be autopopulated when the template is uploaded. reported in open gov portal as owner_org. 
+# GE: consider removing this field (en&fr)?
   - datastore_id: department_name_en
     label:
       en: Department Name (English)
@@ -94,10 +96,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 250 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 250 caractères.
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<250)'
 
 
   - datastore_id: service_name_fr
@@ -111,10 +113,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<250)'
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 250 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 250 caractères.
 
 
   - datastore_id: service_description_en
@@ -128,10 +130,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<500)'
+    excel_error_formula: 'OR({default_formula},{cell}<1800)'
     validation:
-      en: This field must not be empty and max 500 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 500 caractères.
+      en: This field must not be empty and max 1800 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 1800 caractères.
 
 
   - datastore_id: service_description_fr
@@ -145,10 +147,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<500)'
+    excel_error_formula: 'OR({default_formula},{cell}<1800)'
     validation:
-      en: This field must not be empty and max 500 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 500 caractères.
+      en: This field must not be empty and max 1800 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 1800 caractères.
 
 
   - datastore_id: service_type
@@ -170,28 +172,28 @@ resources:
     excel_required: true
     validation: This field must not be empty
     choices:
-      apir:
+      APIR:
         en: Agreements, Permissions, Inspections, Rulings
         fr: Accords, autorisations, inspections, décisions
-      cer:
+      CER:
         en: Care, Education, Recreation
         fr: Soins, éducation, loisirs
-      gnc:
+      GNC:
         en: Grants and Contributions
         fr: Subventions et contributions
-      info:
+      INFO:
         en: Information
         fr: Informations
-      lrp:
+      LRP:
         en: Legislation, Regulation, Policy
         fr: Législation, réglementation, politique
-      ppi:
+      PPI:
         en: Penalities, Protection, Intervention
         fr: Pénalités, protection, interventions
-      reg_vol:
+      REG_VOL:
         en: High Volume Regulatory Transactions
         fr: Opérations reglementaires à demande élevée
-      res:
+      RES:
         en: Resources
         fr: Ressources
 
@@ -225,17 +227,17 @@ resources:
     excel_required: true
     validation: This field must not be empty
     choices:
-      client:
+      CLIENT:
         en: Targeted, Client-based service
         fr: Service ciblé, axé sur les clients
-      society:
+      SOCIETY:
         en: Untargeted, Societal-based service
         fr: Service non-ciblé, axé sur la société
 
   - datastore_id: service_scope
     label:
-      en: External Service or Internal Enterprise Service
-      fr: Service externe ou service intégré interne
+      en: Service scope
+      fr: Étendue du service
     description:
       en: Indicates whether the service is external or internal to government.
       fr: >
@@ -249,16 +251,16 @@ resources:
     excel_required: true
     validation: This field must not be empty
     choices:
-      cluster:
+      CLUSTER:
         en: Internal Cluster Service
         fr: Service cluster interne
-      enterprise:
+      ENTERPRISE:
         en: Internal Enterprise Service
         fr: Service interne intégré
-      extern:
+      EXTERN:
         en: External Service
         fr: Service externe
-      intern:
+      INTERN:
         en: Internal Service
         fr: Service interne
 
@@ -277,22 +279,22 @@ resources:
     excel_required: true
     validation: This field must not be empty
     choices:
-      econom:
+      ECONOM:
         en: Economic Segments (Businesses)
         fr: Segments économiques (entreprises)
-      for:
+      FOR:
         en: Foreign Entities
         fr: Entités étrangères
-      intern_gov:
+      INTERN_GOV:
         en: Internal to Government
         fr: Interne au gouvernement
-      ngo:
+      NGO:
         en: Non Profit Institutions and Organizations
         fr: Institutions et organismes sans but lucratif
-      person:
+      PERSON:
         en: Persons
         fr: Particuliers
-      ptc:
+      PTC:
         en: Provinces, Territories or Communities
         fr: Provinces, territoires et collectivités
 
@@ -317,8 +319,8 @@ resources:
         d'identification du programme, au besoin.
     datastore_type: text
     format_type: Free text
-    obligation: Optional
-    # occurrence: Single
+    obligation: Mandatory
+    # occurrence: Single #GE: to confirm w team whether we allow multiple programs
     # choices: # create from https://open.canada.ca/data/en/dataset/3c371e57-d487-49fa-bb0d-352ae8dd6e4e
 
   - datastore_id: program_name_en
@@ -376,30 +378,102 @@ resources:
     excel_full_text_choices: true
     validation: This field must not be empty
     choices:
-      eml:
+      EML:
         en: Email
         fr: Courriel
-      fax:
+      FAX:
         en: Fax
         fr: Télécopieur
-      non:
+      NON:
         en: No feedback collected
         fr: Aucune rétroaction possible
-      onl:
+      ONL:
         en: Online
         fr: En ligne
-      oth:
+      OTH:
         en: Other channel not listed
         fr: Autre option qui n'est pas sur la liste
-      person:
+      PERSON:
         en: In-Person
         fr: En personne
-      post:
+      POST:
         en: Postal Mail
         fr: Courrier postal
-      tel:
+      TEL:
         en: Telephone
         fr: Téléphone
+
+  - datastore_id: ads_sda
+    label:
+      en: Automaded Decision System
+      fr: Système décisionel automatisé
+    description:
+      en: >
+        An automated decision system is defined in the Directive on Automated 
+        Decision-Making and means any technology that either assists or 
+        replaces the judgment of human decision-makers, such as those that 
+        draw from fields like statistics, linguistics and computer science, 
+        and use techniques such as rules-based systems, regression, predictive 
+        analytics, machine learning, deep learning, and neural networks.      
+      fr: >
+        Un système décisionnel automatisé est défini dans la Directive sur la 
+        prise de décisions automatisée et désigne toute technologie qui assiste 
+        ou remplace le jugement des décideurs humains, comme ceux qui proviennent 
+        de domaines tels que les statistiques, la linguistique et les sciences 
+        informatiques, et utilisent des techniques telles que les systèmes basés 
+        sur des règles, la régression, l'analytique prédictive, l'apprentissage 
+        automatique, l'apprentissage en profondeur et les réseaux neuronaux. 
+    datastore_type: boolean
+    format_type: Controlled List
+    obligation: Mandatory
+    excel_required: true
+    validation: This field must not be empty
+    choices:
+      False:
+        en: 'No'
+        fr: Non
+      True:
+        en: 'Yes'
+        fr: Oui
+
+  - datastore_id: ads_sda_desc_en
+    label:
+      en: Automated Decision System Description (English)
+      fr: Description du système décisionel automatisé (en anglais)
+    description:
+      en: >
+        Describe what the system does. Include: the name or title of the 
+        system, the role of the system in the decision, whether it is full or 
+        partial automation, and how officers use the system to make or inform 
+        the decision.
+      fr: >
+        Décrivez ce que fait le système. Inclure : le nom ou titre du système, 
+        le rôle du système dans la prise de décision, s'il s'agit d'une 
+        automatisation complète ou partielle, et comment les agents utilisent 
+        le système pour prendre ou informer la décision.
+    datastore_type: text
+    format_type: free text
+    obligation: Optional
+
+  - datastore_id: ads_sda_desc_fr
+    label:
+      en: Automated Decision System Description (French)
+      fr: Description du système décisionel automatisé (en français)
+    description:
+      en: >
+        Describe what the system does. Include: the name or title of the 
+        system, the role of the system in the decision, whether it is full or 
+        partial automation, and how officers use the system to make or inform 
+        the decision.
+      fr: >
+        Décrivez ce que fait le système. Inclure : le nom ou titre du système, 
+        le rôle du système dans la prise de décision, s'il s'agit d'une 
+        automatisation complète ou partielle, et comment les agents utilisent 
+        le système pour prendre ou informer la décision.
+    datastore_type: text
+    format_type: free text
+    obligation: Optional
+
 
   - datastore_id: service_fee
     label:
@@ -440,7 +514,7 @@ resources:
         personnel où il peut utiliser d'autres points d'interaction
         (demander des services, fournir des renseignements, voir son statut,
         soumettre des commentaires, etc.).
-    datastore_type: int
+    datastore_type: int #GE: this might have to be text? unsure
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -466,7 +540,7 @@ resources:
     description:
       en: Identifies whether a client can authenticate their identity online.
       fr: Indique si un client peut confirmer son identité en ligne
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -492,7 +566,7 @@ resources:
     description:
       en: Identifies whether a client can apply for a service online
       fr: Indique si un client peut présenter une demande de service en ligne
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -522,7 +596,7 @@ resources:
       fr: >
         Indique si un client peut être informé en ligne du résultat de sa
         demande de ce service.
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -551,7 +625,7 @@ resources:
       fr: >
         Indique si un client peut recevoir le service en ligne, peut-être
         sous forme de permis, de certificats, d'argent ou d'information.
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -580,7 +654,7 @@ resources:
       fr: >
         Indique si un client peut demander une résolution à leur problèmes
         avec le service ou fournir de la rétroaction en ligne.
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -650,11 +724,11 @@ resources:
         Identifie l'exercice lors duquel le plus récent examen de service a
         été mené
     datastore_type: year
-    obligation: Mandatory
+    obligation: Mandatory #GE: need to decide if we're allowing blanks if no review performed
     occurrence: Single
     excel_required: true
     validation: This field must not be empty
-    choices_file: choices/fiscal_year.yaml
+    choices_file: choices/fiscal_year.yaml 
 
     datastore_id: last_year_of_service_improvement_based_on_client_feedback
     label:
@@ -670,11 +744,11 @@ resources:
         Quelle a été l'année la plus récente au cours de laquelle ce service
         a été amélioré en fonction des commentaires des clients?
     datastore_type: year
-    obligation: Mandatory
+    obligation: Mandatory #GE: need to decide if we're allowing blanks if no review performed
     occurrence: Single
     excel_required: true
     validation: This field must not be empty
-    choices_file: choices/fiscal_year.yaml
+    choices_file: choices/fiscal_year.yaml 
 
   - datastore_id: cra_business_number
     label:
@@ -689,7 +763,7 @@ resources:
         Identifie si le numéro d'entreprise de l'Agence du Revenu du Canada
         est utilisé dans la prestation du service si le service est livré à
         une entreprise.
-    datastore_type: int
+    datastore_type: int #GE: might have to be text
     format_type: Controlled List
     obligation: Mandatory
     occurrence: Single
@@ -727,8 +801,8 @@ resources:
     validation: This field must not be empty
     choices:
       '-1':
-        en: N/A (not a service to businesses)
-        fr: S.O. (N'est pas un service aux entreprises)
+        en: N/A (not a service to individuals)
+        fr: S.O. (N'est pas un service aux particuliers)
       '0':
         en: 'No'
         fr: Non
@@ -881,7 +955,7 @@ resources:
       fr: >
         Indique le nombre de demandes reçues par télécopieur au cours d'un
         exercice
-    datastore_type: text #GE: if these can be NA or ND, I think these need to be text
+    datastore_type: text
     format_type: Numeric, NA or ND
     obligation: Mandatory
     excel_required: true
@@ -952,6 +1026,7 @@ resources:
     format_type: Free text
     obligation: Optional
 
+#ge: URLs need a max length, probably 100 chars?
   - datastore_id: service_url_en
     label:
       en: URL to Service (English)
@@ -967,6 +1042,7 @@ resources:
     format_type: Free text
     obligation: Optional
 
+#ge: URLs need a max length, probably 100 chars?
   - datastore_id: service_url_fr
     label:
       en: URL to Service (French)
@@ -1126,7 +1202,7 @@ resources:
       fr: >
         Indique l'exercice pour lequel les données sur les services sont
         déclarées.
-    datastore_type: year
+    datastore_type: year #GE: year or text?
     obligation: Mandatory
     occurrence: Single
     excel_required: true
@@ -1161,10 +1237,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<250)'
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 250 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 250 caractères.
 
   - datastore_id: service_name_fr
     label:
@@ -1177,10 +1253,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<250)'
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 250 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 256 caractères.
 
   - datastore_id: service_std_id
     label:
@@ -1219,10 +1295,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<500)'
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 500 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 500 caractères.
 
   - datastore_id: service_std_fr
     label:
@@ -1242,10 +1318,10 @@ resources:
     format_type: Free text
     obligation: Mandatory
     excel_required: true
-    excel_error_formula: 'OR({default_formula},{cell}<100)'
+    excel_error_formula: 'OR({default_formula},{cell}<500)'
     validation:
-      en: This field must not be empty and max 100 characters.
-      fr: Cette cellule est obligatoire et ne doit pas excéder 100 caractères.
+      en: This field must not be empty and max 500 characters.
+      fr: Cette cellule est obligatoire et ne doit pas excéder 500 caractères.
 
   - datastore_id: service_std_type
     label:
@@ -1306,25 +1382,25 @@ resources:
     excel_required: true
     validation: This field must not be empty
     choices:
-      eml:
+      EML:
         en: Email
         fr: Courriel
-      fax:
+      FAX:
         en: Fax
         fr: Télécopieur
-      onl:
+      ONL:
         en: Online
         fr: En ligne
-      oth:
+      OTH:
         en: Other
         fr: Autre
-      person:
+      PERSON:
         en: In-person
         fr: En personne
-      post:
+      POST:
         en: Postal mail
         fr: Courrier postal
-      tel:
+      TEL:
         en: Telephone
         fr: Téléphone
 
@@ -1346,11 +1422,11 @@ resources:
     format_type: Free text
     obligation: Optional
     excel_required: true
-    excel_error_formula: 'OR({default_formula},ISBLANK({cell}),{cell}<500)'
+    excel_error_formula: 'OR({default_formula},ISBLANK({cell}),{cell}<1500)'
     validation:
-      en: This field can be empty or up to max 500 characters.
+      en: This field can be empty or up to max 1500 characters.
       fr: >
-        Ce champ peut être vide ou contenir un maximum de 500 caractères.
+        Ce champ peut être vide ou contenir un maximum de 1500 caractères.
 
   - datastore_id: standard_channel_comment_fr
     label:
@@ -1369,34 +1445,35 @@ resources:
     datastore_type: text
     format_type: Free text
     obligation: Optional
-    excel_error_formula: 'OR({default_formula},ISBLANK({cell}),{cell}<500)'
+    excel_error_formula: 'OR({default_formula},ISBLANK({cell}),{cell}<1500)'
     excel_required: true
     validation:
-      en: This field can be empty or up to max 500 characters.
+      en: This field can be empty or up to max 1500 characters.
       fr: >
-        Ce formulaire peut être vide ou contenir un maximum de 500
+        Ce formulaire peut être vide ou contenir un maximum de 1500
         caractères.
 
-  - datastore_id: target_type
-    label:
-      en: Target Type
-      fr: Type de cible
-    description:
-      en: Identifies the type of service standard target.
-      fr: Identifie le type de cible de la norme de service.
-    datastore_type: text
-    format_type: Controlled List
-    obligation: Mandatory
-    occurrence: Single
-    excel_required: true
-    validation: This field must not be empty
-    choices:
-      other_type:
-        en: Other type of target
-        fr: Autre type de cible
-      percentage:
-        en: Percentage of outcomes
-        fr: Pourcentage des résultats
+# GE: we got rid of this field. all targets will need to be a percentage
+#  - datastore_id: target_type
+#    label:
+#      en: Target Type
+#      fr: Type de cible
+#    description:
+#      en: Identifies the type of service standard target.
+#      fr: Identifie le type de cible de la norme de service.
+#    datastore_type: text
+#    format_type: Controlled List
+#    obligation: Mandatory
+#    occurrence: Single
+#    excel_required: true
+#    validation: This field must not be empty
+#    choices:
+#      other_type:
+#        en: Other type of target
+#        fr: Autre type de cible
+#      percentage:
+#        en: Percentage of outcomes
+#        fr: Pourcentage des résultats
 
   - datastore_id: service_std_target
     label:
@@ -1426,15 +1503,19 @@ resources:
         services
     description:
       en: >
-        Identifies the number of final outputs issued appropriate to the
-        service (eg. payments issued, requests completed, etc) during the
-        fiscal year that met a particular service standard target for a
-        service.
+        Identifies the number of final outputs issued appropriate to the 
+        service (eg. payments issued, requests completed, etc) during the 
+        fiscal year that met a particular service standard target for a 
+        service. Blank indicates no information available, while 0 indicates 
+        that no final outputs issued met service standard targets.
       fr: >
-        Indique le nombre d'opérations de service effectuées (p. ex. les
-        appels auxquels on a répondu, les paiements émis, les demandes
-        traitées, etc.) au cours de l'exercice qui ont respecté une norme
-        relative aux services particulière à un service.
+        Indique le nombre d'opérations de service effectuées (p. ex. les 
+        appels auxquels on a répondu, les paiements émis, les demandes 
+        traitées, etc.) au cours de l'exercice qui ont respecté une norme 
+        relative aux services particulière à un service. Un champ vide 
+        indique qu'aucune information n'est disponible, tandis que 0 indique 
+        qu'aucun résultat final n'a été émis qui a atteint les objectifs de 
+        la norme de service.
     datastore_type: numeric
     format_type: Numeric or ND
     obligation: Optional
@@ -1486,6 +1567,7 @@ resources:
 #     validation: This field must not be empty
 #     excel_required: true
 
+#GE: Need a max length 2000
   - datastore_id: standard_comment_en
     label:
       en: Comments on the service standard in general (English)
@@ -1497,6 +1579,7 @@ resources:
     format_type: Free text
     obligation: Optional
 
+#GE: Need a max length 2000
   - datastore_id: standard_comment_fr
     label:
       en: Comments on the service standard in general (French)
@@ -1508,6 +1591,7 @@ resources:
     format_type: Free text
     obligation: Optional
 
+#GE: TODO: make calculated? remove entirely? there is no longer a target_type to justify this field
   - datastore_id: target_met
     label:
       en: Was the target met
@@ -1516,9 +1600,7 @@ resources:
       en: >
         'A yes, no or not applicable field that is automatically calculated for
         target_type "Percentage of outcomes", where "Not applicable" is
-        autopopulated when field total_volume is reported as 0. Otherwise the
-        result is self-reported by departments for target_type "Other type of
-        target".'
+        autopopulated when field total_volume is reported as 0.'
       fr: >
         'Un champ oui, non ou sans objet calculé automatiquement pour
         target_type « Pourcentage de résultats », où « Sans objet » est rempli
@@ -1539,6 +1621,7 @@ resources:
         en: 'Yes'
         fr: Oui
 
+#GE: need a max length 100
   - datastore_id: service_std_url_en
     label:
       en: URL to Service Standards and Targets (English)
@@ -1556,6 +1639,7 @@ resources:
     excel_required: true
     validation: This field must not be empty
 
+#GE: need a max length 100
   - datastore_id: service_std_url_fr
     label:
       en: URL to Service Standards and Targets (French)
@@ -1573,6 +1657,7 @@ resources:
     excel_required: true
     validation: This field must not be empty
 
+#GE: need a max length 100
   - datastore_id: realtime_result_url_en
     datastore_type: text
     label:
@@ -1586,11 +1671,10 @@ resources:
         Identifie la site Web du service sur laquelle les résultats de
         performance en temps réel d'un service sont publiés
     format_type: Free text
-    obligation: Mandatory
-    occurrence: Single
-    excel_required: true
-    validation: This field must not be empty
+    obligation: Optional
+    occurrence: text
 
+#GE: need a max length 100
   - datastore_id: realtime_result_url_fr
     label:
       en: URL to Real-Time Performance Results (French)
@@ -1606,6 +1690,7 @@ resources:
     datastore_type: text
     obligation: Optional
 
+#GE: See department stuff in service inventory. could be automatically generated by owner_org function?
   - datastore_id: department_name_en
     label:
       en: Department Name (English)
