@@ -58,7 +58,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ckan.rule=Host(`servicetest.gcperformance.ca`)"  # Replace with your domain
+      - "traefik.http.routers.ckan.rule=Host(`${CKAN_SITE_URL}`)"
       - "traefik.http.routers.ckan.entrypoints=websecure"
       - "traefik.http.routers.ckan.tls.certresolver=myresolver"
       - "traefik.http.services.ckan.loadbalancer.server.port=${CKAN_SITE_PORT}"
