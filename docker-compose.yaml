@@ -1,19 +1,29 @@
 services:
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.1
     container_name: traefik
     command:
+      - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=admin@gcperformance.ca"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web-secure.address=:443"
+
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@${SITE_URL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+
+      - "--entrypoints.web.http.redirections.entrypoint.to=web-secure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      - "--accesslog=true"
+
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
@@ -58,15 +68,18 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ckan.rule=Host(`${CKAN_SITE_URL}`)"
-      - "traefik.http.routers.ckan.entrypoints=websecure"
-      - "traefik.http.routers.ckan.tls.certresolver=myresolver"
+      - "traefik.http.routers.ckan.rule=Host(`${SITE_URL}`)"
+      - "traefik.http.routers.ckan.entrypoints=web-secure"
+      - "traefik.http.routers.ckan.tls.certresolver=letsencrypt"
       - "traefik.http.services.ckan.loadbalancer.server.port=${CKAN_SITE_PORT}"
+
+      - "traefik.http.services.ckan.loadbalancer.healthcheck.path=/api/3/action/status_show"
+      - "traefik.http.services.ckan.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.ckan.loadbalancer.healthcheck.timeout=3s"
+      - "traefik.http.services.ckan.loadbalancer.healthcheck.scheme=http"
 
     restart: unless-stopped
     command: ./start.sh
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", CKAN_SITE_URL]
 
   postgres:
     container_name: postgres
