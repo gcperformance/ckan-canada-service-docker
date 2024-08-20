@@ -728,7 +728,7 @@ resources:
     occurrence: Single
     excel_required: true
     validation: This field must not be empty
-    choices_file: choices/fiscal_year.yaml 
+    choices_file: choices/fiscal_year.yaml
 
     datastore_id: last_year_of_service_improvement_based_on_client_feedback
     label:
@@ -748,7 +748,7 @@ resources:
     occurrence: Single
     excel_required: true
     validation: This field must not be empty
-    choices_file: choices/fiscal_year.yaml 
+    choices_file: choices/fiscal_year.yaml
 
   - datastore_id: cra_business_number
     label:
@@ -1139,11 +1139,10 @@ resources:
         errors := errors || required_error(NEW.program_name_fr, 'program_name_fr');
         errors := errors || required_error(NEW.program_id_code, 'program_id_code');
         errors := errors || required_error(NEW.client_target_groups, 'client_target_groups');
-        NEW.client_target_groups := choices_from(
-          NEW.client_target_groups, {client_target_groups}, 'client_target_groups');
-        errors := errors || required_error(NEW.cra_business_number, 'cra_business_number');
+        NEW.client_target_groups := choices_from(NEW.client_target_groups, {client_target_groups}, 'client_target_groups');
         errors := errors || required_error(NEW.service_fee, 'service_fee');
         errors := errors || choice_error(NEW.service_fee, {service_fee}, 'service_fee');
+        errors := errors || required_error(NEW.cra_business_number, 'cra_business_number');
         errors := errors || choice_error(NEW.cra_business_number, {cra_business_number}, 'cra_business_number');
         errors := errors || required_error(NEW.online_applications, 'online_applications');
         errors := errors || integer_or_na_nd_error(NEW.online_applications, 'online_applications');
