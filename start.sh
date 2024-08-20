@@ -7,7 +7,7 @@ ckan -c ./ckan.ini db init
 ckan -c ckan.ini datastore set-permissions | psql --set ON_ERROR_STOP=1
 
 echo "Create admin user"
-ckan user add admin email=admin@example.com password=Admin123*
+ckan user add admin email=${CKAN_ADMIN_EMAIL} password=${CKAN_ADMIN_PASSWD}
 ckan sysadmin add admin
 
 echo "Update canada triggers"
