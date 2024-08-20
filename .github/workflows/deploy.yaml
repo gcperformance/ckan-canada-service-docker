@@ -19,7 +19,7 @@ jobs:
           command_timeout: 200m
           script: |
            cd ~/projects/ckan-canada-docker
-           git pull
+           git fetch
+           git reset --hard origin/master
            docker compose build --force-rm --no-cache --compress
-           docker compose rm -fsv postgres
            docker compose up -d
