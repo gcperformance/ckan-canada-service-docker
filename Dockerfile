@@ -45,4 +45,4 @@ COPY service.yaml /srv/app/src/ckanext-canada/ckanext/canada/tables/service.yaml
 ## Expose port 5000 for web interface
 EXPOSE 5000
 
-CMD ["start.sh"]
+#CMD ["start.sh"]
