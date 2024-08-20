@@ -11,7 +11,7 @@ ckan user add admin email=${CKAN_ADMIN_EMAIL} password=${CKAN_ADMIN_PASSWD}
 ckan sysadmin add admin
 
 echo "Create organization"
-ckanapi -c ckan.ini action organization_create name=tbs title="Treasury Board" faa_schedule="NA" registry_access="public"  shortform='{ "en": "tbs", "fr": "sct" }' title_translated='{"en": "Treasury Board", "fr": "Secrétariat du Conseil du Trésor"}'
+ckanapi -c ckan.ini action organization_create name=tbs-sct title="Treasury Board" faa_schedule="NA" registry_access="public"  shortform='{ "en": "tbs", "fr": "sct" }' title_translated='{"en": "Treasury Board", "fr": "Secrétariat du Conseil du Trésor"}'
 
 echo "Update canada triggers"
 ckan -c ckan.ini canada update-triggers
