@@ -1,5 +1,5 @@
 name: CI
-  
+
 on: [push]
 
 jobs:
@@ -21,4 +21,5 @@ jobs:
            cd ~/projects/ckan-canada-docker
            git pull
            docker compose build --force-rm --no-cache --compress
-           docker compose up -d 
+           docker compose rm -fsv postgres
+           docker compose up -d
