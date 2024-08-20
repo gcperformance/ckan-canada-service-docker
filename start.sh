@@ -10,6 +10,9 @@ echo "Create admin user"
 ckan user add admin email=${CKAN_ADMIN_EMAIL} password=${CKAN_ADMIN_PASSWD}
 ckan sysadmin add admin
 
+echo "Create organization"
+ckanapi -c ckan.ini action organization_create name=tbs title="Treasury Board" faa_schedule="NA" registry_access="public"  shortform='{ "en": "tbs", "fr": "sct" }' title_translated='{"en": "TBS", "fr": "SCT"}'
+
 echo "Update canada triggers"
 ckan -c ckan.ini canada update-triggers
 python3 /srv/app/src/ckanext-canada/bin/download_country.py
