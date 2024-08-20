@@ -21,7 +21,6 @@ RUN git --git-dir=/srv/app/src/ckan/.git --work-tree=/srv/app/src/ckan/ pull
 # Dependencies
 RUN pip install -e /srv/app/src/ckan/ -r /srv/app/src/ckan/requirements.txt -r /srv/app/src/ckan/dev-requirements.txt
 RUN pip install -e 'git+https://github.com/ckan/ckanapi.git#egg=ckanapi' -r 'https://raw.githubusercontent.com/ckan/ckanapi/master/requirements.txt'
-RUN pip install -e 'git+https://github.com/open-data/ckanext-canada.git#egg=ckanext-canada' -r 'https://raw.githubusercontent.com/open-data/ckanext-canada/master/requirements.txt' -r 'https://raw.githubusercontent.com/open-data/ckanext-canada/master/test-requirements.txt'
 RUN pip install -e 'git+https://github.com/ckan/ckanext-fluent.git#egg=ckanext-fluent' -r 'https://raw.githubusercontent.com/ckan/ckanext-fluent/master/requirements.txt'
 RUN pip install -e 'git+https://github.com/open-data/ckanext-recombinant.git#egg=ckanext-recombinant' -r 'https://raw.githubusercontent.com/open-data/ckanext-recombinant/master/requirements.txt'
 RUN pip install -e 'git+https://github.com/ckan/ckanext-scheming.git#egg=ckanext-scheming'
@@ -31,6 +30,16 @@ RUN pip install -e 'git+https://github.com/ckan/ckantoolkit.git#egg=ckantoolkit'
 RUN pip install -e 'git+https://github.com/open-data/goodtables.git@canada-py3#egg=goodtables' -r 'https://raw.githubusercontent.com/open-data/goodtables/canada-py3/requirements.txt'
 RUN pip install -e 'git+https://github.com/open-data/ckanext-security.git@canada-py3#egg=ckanext-security' -r 'https://raw.githubusercontent.com/open-data/ckanext-security/canada-py3/requirements.txt'
 RUN find /srv/app/ -name '*.pyc' -delete
+
+# Fetch and merge changes from pull request #1503
+RUN git clone https://github.com/open-data/ckanext-canada.git /srv/app/src/ckanext-canada && \
+    cd /srv/app/src/ckanext-canada && \
+    git fetch origin pull/1503/head:PR1503 && \
+    git checkout master && \
+    git merge PR1503
+
+# Install CKAN Canada extension
+RUN pip install -e /srv/app/src/ckanext-canada/ -r 'https://raw.githubusercontent.com/open-data/ckanext-canada/master/requirements.txt' -r 'https://raw.githubusercontent.com/open-data/ckanext-canada/master/test-requirements.txt'
 
 # CKAN setup
 RUN rm ./ckan.ini ./who.ini
