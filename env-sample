@@ -1,0 +1,33 @@
+# PostgreSQL Configuration
+PGHOST=postgres
+PGPORT=5432
+PGUSER=ckan_default
+PGPASSWORD=pass
+PGDATABASE=ckan_test
+
+# CKAN Configuration
+CKAN_POSTGRES_DB=ckan_test
+CKAN_DATASTORE_POSTGRES_DB=datastore_test
+CKAN_POSTGRES_USER=ckan_default
+CKAN_DATASTORE_POSTGRES_READ_USER=ckan_default
+CKAN_DATASTORE_POSTGRES_WRITE_USER=ckan_default
+CKAN_POSTGRES_PWD=pass
+CKAN_DATASTORE_POSTGRES_READ_PWD=pass
+CKAN_DATASTORE_POSTGRES_WRITE_PWD=pass
+
+CKAN_SQLALCHEMY_URL=postgresql://ckan_default:pass@postgres/ckan_test
+CKAN_DATASTORE_WRITE_URL=postgresql://ckan_default:pass@postgres/datastore_test
+CKAN_DATASTORE_READ_URL=postgresql://ckan_default:pass@postgres/datastore_test
+CKAN_SOLR_URL=http://solr:8983/solr/ckan_registry
+CKAN_REDIS_URL=redis://redis:6379/1
+
+SITE_URL=localhost
+CKAN_SITE_URL=https://localhost
+CKAN_SITE_PORT=5000
+
+CKAN_ADMIN_EMAIL=admin@yourdomain.com
+CKAN_ADMIN_PASSWD=**PasswordHere**
+
+POSTGRES_USER=ckan_default
+POSTGRES_PASSWORD=pass
+POSTGRES_DB=ckan_test
