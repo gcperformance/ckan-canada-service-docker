@@ -10,6 +10,4 @@
 
 or
 
-### Login
-
-`https://service.alpha.gcperformance.ca`
+### Login @ https://service.alpha.gcperformance.ca
